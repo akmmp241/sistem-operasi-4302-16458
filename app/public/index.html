@@ -10,8 +10,23 @@
   <script src="/app.js" defer></script>
 </head>
 <body>
-  <header class="topbar"><a class="brand" href="/" aria-label="Rapi beranda"><span class="brand-mark">✓</span>rapi<span class="brand-dot">.</span></a><span class="top-note">Sedikit demi sedikit, selesai.</span></header>
+  <header class="topbar"><a class="brand" href="/" aria-label="Rapi beranda"><span class="brand-mark">✓</span>rapi<span class="brand-dot">.</span></a><span class="top-note">Sedikit demi sedikit, selesai.</span><div id="account" class="account" hidden><span id="account-name"></span><button id="logout" class="secondary" type="button">Keluar</button></div></header>
   <main>
+    <section id="auth-panel" class="auth-panel" aria-labelledby="auth-heading">
+      <div class="eyebrow">Selamat datang di Rapi</div>
+      <h1 id="auth-heading">Masuk ke akunmu.</h1>
+      <p class="intro" id="auth-description">Simpan rencana harianmu dan lanjutkan kapan saja.</p>
+      <form id="auth-form" class="auth-form">
+        <div id="name-field" hidden><label for="auth-name">Nama</label><input id="auth-name" name="name" maxlength="100" autocomplete="name" disabled></div>
+        <label for="auth-email">Email</label><input id="auth-email" name="email" type="email" maxlength="254" autocomplete="username" required>
+        <label for="auth-password">Password</label><input id="auth-password" name="password" type="password" minlength="8" maxlength="128" autocomplete="current-password" required aria-describedby="password-help">
+        <span id="password-help" class="auth-help">Gunakan password sepanjang 8–128 karakter.</span>
+        <p id="auth-error" role="alert" hidden></p>
+        <button id="auth-submit" class="primary" type="submit">Masuk</button>
+      </form>
+      <p class="auth-switch"><span id="auth-switch-label">Belum punya akun?</span> <button id="auth-toggle" type="button">Daftar sekarang</button></p>
+    </section>
+    <div id="todo-view" hidden>
     <div class="eyebrow" id="today"></div>
     <h1>Ruang untuk<br><span>rencana harianmu.</span></h1>
     <p class="intro">Catat yang perlu dikerjakan. Fokus satu per satu.</p>
@@ -31,6 +46,7 @@
       <div id="task-list" aria-live="polite"><div class="empty">Memuat tugas…</div></div>
       <div class="panel-footer"><span class="small-dot"></span><span id="progress-label">Mulai dari satu langkah kecil.</span></div>
     </section>
+    </div>
     <footer>Dibuat sederhana, supaya kamu bisa fokus.</footer>
   </main>
   <dialog id="edit-dialog">

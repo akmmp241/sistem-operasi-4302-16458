@@ -6,16 +6,22 @@ let busy = false;
 const dateFormat = new Intl.DateTimeFormat("id-ID", { day: "numeric", month: "long" });
 $("#today").textContent = new Intl.DateTimeFormat("id-ID", { weekday: "long", day: "numeric", month: "long", year: "numeric" }).format(new Date());
 
-async function api(path = "", options = {}) {
-  const response = await fetch(`/api/todos${path}`, {
+async function requestApi(path, options = {}) {
+  const response = await fetch(path, {
     ...options,
     headers: { "Content-Type": "application/json" },
   });
   if (response.status === 204) return null;
   const data = await response.json();
-  if (!response.ok) throw new Error(data.error || "Permintaan gagal.");
+  if (!response.ok) {
+    if (response.status === 401 && path.startsWith("/api/todos")) setUser(null);
+    const error = new Error(data.error || "Permintaan gagal.");
+    error.status = response.status;
+    throw error;
+  }
   return data;
 }
+const api = (path = "", options = {}) => requestApi(`/api/todos${path}`, options);
 function showError(error, target = "#error") {
   $(target).textContent = error.message || "Koneksi gagal. Periksa server lalu coba lagi.";
   $(target).hidden = false;
@@ -134,7 +140,89 @@ document.querySelectorAll("[data-filter]").forEach((button) => {
     render();
   };
 });
-api().then((data) => { todos = data; render(); }).catch((error) => {
+let authMode = "login";
+function setUser(user) {
+  $("#auth-panel").hidden = Boolean(user);
+  $("#todo-view").hidden = !user;
+  $("#account").hidden = !user;
+  $(".top-note").hidden = Boolean(user);
+  $("#account-name").textContent = user?.name || "";
+  if (!user) {
+    todos = [];
+    editingId = null;
+    $("#edit-dialog").close();
+    $("#title").value = "";
+    $("#edit-title").value = "";
+    render();
+  }
+}
+async function loadTodos() {
+  todos = await api();
   render();
-  showError(error);
-});
+}
+$("#auth-toggle").onclick = () => {
+  authMode = authMode === "login" ? "register" : "login";
+  const register = authMode === "register";
+  $("#auth-heading").textContent = register ? "Buat akunmu." : "Masuk ke akunmu.";
+  $("#auth-description").textContent = register ? "Daftar untuk mulai mencatat rencana harianmu." : "Simpan rencana harianmu dan lanjutkan kapan saja.";
+  $("#name-field").hidden = !register;
+  $("#auth-name").disabled = !register;
+  $("#auth-name").required = register;
+  $("#auth-password").autocomplete = register ? "new-password" : "current-password";
+  $("#auth-password").value = "";
+  $("#auth-submit").textContent = register ? "Daftar" : "Masuk";
+  $("#auth-switch-label").textContent = register ? "Sudah punya akun?" : "Belum punya akun?";
+  $("#auth-toggle").textContent = register ? "Masuk" : "Daftar sekarang";
+  $("#auth-error").hidden = true;
+  $(register ? "#auth-name" : "#auth-email").focus();
+};
+$("#auth-form").onsubmit = async (event) => {
+  event.preventDefault();
+  $("#auth-submit").disabled = true;
+  $("#auth-toggle").disabled = true;
+  $("#auth-error").hidden = true;
+  try {
+    const { user } = await requestApi(`/api/auth/${authMode}`, {
+      method: "POST",
+      body: JSON.stringify({ name: $("#auth-name").value, email: $("#auth-email").value, password: $("#auth-password").value }),
+    });
+    $("#auth-password").value = "";
+    setUser(user);
+    $("#error").hidden = true;
+    await loadTodos().catch((error) => showError(error));
+  } catch (error) {
+    showError(error, "#auth-error");
+  } finally {
+    $("#auth-submit").disabled = false;
+    $("#auth-toggle").disabled = false;
+  }
+};
+$("#logout").onclick = async () => {
+  $("#logout").disabled = true;
+  try {
+    await requestApi("/api/auth/logout", { method: "POST" });
+    setUser(null);
+    $("#auth-error").hidden = true;
+    $("#auth-email").focus();
+  } catch (error) {
+    showError(error);
+  } finally {
+    $("#logout").disabled = false;
+  }
+};
+async function initialize() {
+  $("#auth-submit").disabled = true;
+  $("#auth-toggle").disabled = true;
+  try {
+    const { user } = await requestApi("/api/auth/me");
+    setUser(user);
+    await loadTodos().catch((error) => showError(error));
+  } catch (error) {
+    setUser(null);
+    if (error.status !== 401) showError(error, "#auth-error");
+  } finally {
+    $("#auth-submit").disabled = false;
+    $("#auth-toggle").disabled = false;
+  }
+}
+initialize();

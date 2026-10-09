@@ -6,6 +6,7 @@
     "dev": "bun --watch src/server.js",
     "start": "bun src/server.js",
     "db:up": "docker compose up -d --wait",
-    "db:down": "docker compose down"
+    "db:down": "docker compose down",
+    "test": "bun test"
   }
 }
