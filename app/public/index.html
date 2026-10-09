@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#245b46">
+  <title>Rapi — Todolist</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%23245b46'/%3E%3Cpath d='m17 33 10 10 21-23' fill='none' stroke='white' stroke-width='6'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/style.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <header class="topbar"><a class="brand" href="/" aria-label="Rapi beranda"><span class="brand-mark">✓</span>rapi<span class="brand-dot">.</span></a><span class="top-note">Sedikit demi sedikit, selesai.</span></header>
+  <main>
+    <div class="eyebrow" id="today"></div>
+    <h1>Ruang untuk<br><span>rencana harianmu.</span></h1>
+    <p class="intro">Catat yang perlu dikerjakan. Fokus satu per satu.</p>
+    <section class="summary" aria-label="Ringkasan tugas">
+      <div><strong id="total">0</strong><span>Total tugas</span></div>
+      <div><strong id="active">0</strong><span>Belum selesai</span></div>
+      <div><strong id="completed">0</strong><span>Sudah selesai</span></div>
+    </section>
+    <section class="task-panel" aria-label="Daftar tugas">
+      <form id="add-form" class="add-form">
+        <label class="sr-only" for="title">Tugas baru</label>
+        <input id="title" name="title" placeholder="Apa yang ingin kamu selesaikan?" maxlength="255" required autocomplete="off">
+        <button class="primary" type="submit"><span aria-hidden="true">＋</span> Tambah<span class="desktop-label"> tugas</span></button>
+      </form>
+      <div class="list-toolbar"><div class="filters" role="group" aria-label="Filter tugas"><button class="selected" data-filter="all" aria-pressed="true">Semua</button><button data-filter="active" aria-pressed="false">Belum selesai</button><button data-filter="completed" aria-pressed="false">Selesai</button></div><span id="list-count">0 tugas</span></div>
+      <p id="error" role="alert" hidden></p>
+      <div id="task-list" aria-live="polite"><div class="empty">Memuat tugas…</div></div>
+      <div class="panel-footer"><span class="small-dot"></span><span id="progress-label">Mulai dari satu langkah kecil.</span></div>
+    </section>
+    <footer>Dibuat sederhana, supaya kamu bisa fokus.</footer>
+  </main>
+  <dialog id="edit-dialog">
+    <form id="edit-form">
+      <h2>Edit tugas</h2><label for="edit-title">Nama tugas</label><input id="edit-title" maxlength="255" required autocomplete="off">
+      <p id="edit-error" role="alert" hidden></p>
+      <div class="dialog-actions"><button type="button" id="cancel-edit" class="secondary">Batal</button><button type="submit" class="primary">Simpan</button></div>
+    </form>
+  </dialog>
+</body>
+</html>

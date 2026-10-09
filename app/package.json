@@ -1,0 +1,11 @@
+{
+  "name": "bun-postgres-todolist",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "bun --watch src/server.js",
+    "start": "bun src/server.js",
+    "db:up": "docker compose up -d --wait",
+    "db:down": "docker compose down"
+  }
+}
